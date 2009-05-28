@@ -3,10 +3,24 @@
 // @namespace      http://github.com/svetlyak40wt/yaru.user
 // @description    Добавляет действие "в курсе всего" в блоках на странице my.ya.ru
 // @include        http://my.ya.ru/*
+// @include        http://*.ya.ru/friends.xml*
 // ==/UserScript==
 //
+// Version: 0.1.0
 // Author: Alexander Artemenko svetlyak.40wt at gmail
 // Site: http://github.com/svetlyak40wt/yaru.user/
+//
+// ChangeLog
+//
+// 0.1.1
+//
+// * Исправлена ошибка в работе скрипта при получении последней порции информации.
+// * В include добавлена страница friends.xml
+//
+// 0.1.0
+//
+// * Начальная реализация
+//
 
 var limit_queries = 1000;
 
@@ -39,13 +53,13 @@ function init_plugin() {
                     if (ajax_params.ajaxMethod_post == 'unread_replies_do_update_safe') {
                         log('adding link');
                         var mark_readed = function(ids) {
-                            var url = 'http://my.ya.ru/ajax/unread_replies_do_update_safe.xml';
+                            var url = '/ajax/unread_replies_do_update_safe.xml';
                             $.get(url, {unread: ids}, function(data) {
-                                var next_ids = $(data).find('a.update')[0].onclick();
+                                var next_ids = $(data).find('a.update');
                                 --limit_queries;
-                                if (next_ids != '' && limit_queries > 0) {
+                                if (next_ids.length > 0 && limit_queries > 0) {
                                     v_kurse_vsego.html($(data).find('h3.plain a').html());
-                                    mark_readed(next_ids);
+                                    mark_readed(next_ids[0].onclick());
                                 } else {
                                     $(form).html(data);
                                 }
