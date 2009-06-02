@@ -6,16 +6,19 @@
 // @include        http://*.ya.ru/friends.xml*
 // ==/UserScript==
 //
-// Version: 0.1.0
+// Version: 0.1.2
 // Author: Alexander Artemenko svetlyak.40wt at gmail
 // Site: http://github.com/svetlyak40wt/yaru.user/
 //
 // ChangeLog
 //
+// 0.1.2
+//
+// * Исправлена работа с блоком "С вами хотят подружится."
+//
 // 0.1.1
 //
 // * Исправлена ошибка в работе скрипта при получении последней порции информации.
-// * В include добавлена страница friends.xml
 //
 // 0.1.0
 //
@@ -50,23 +53,25 @@ function init_plugin() {
                 v_kurse_vsego.click(function(e) {
                     e.preventDefault();
                     var ajax_params = form.onclick();
-                    if (ajax_params.ajaxMethod_post == 'unread_replies_do_update_safe') {
-                        log('adding link');
-                        var mark_readed = function(ids) {
-                            var url = '/ajax/unread_replies_do_update_safe.xml';
-                            $.get(url, {unread: ids}, function(data) {
-                                var next_ids = $(data).find('a.update');
-                                --limit_queries;
-                                if (next_ids.length > 0 && limit_queries > 0) {
-                                    v_kurse_vsego.html($(data).find('h3.plain a').html());
-                                    mark_readed(next_ids[0].onclick());
-                                } else {
-                                    $(form).html(data);
-                                }
-                            });
-                        }
-                        mark_readed(v_kurse[0].onclick());
+                    var url = '/ajax/' + ajax_params.ajaxMethod_post + '.xml';
+
+                    log('adding link');
+                    var mark_readed = function(ids) {
+                        var params = {};
+                        params[ajax_params.ajaxParamName] = ids;
+
+                        $.get(url, params, function(data) {
+                            var next_ids = $(data).find('a.update');
+                            --limit_queries;
+                            if (data != '' && next_ids.length > 0 && limit_queries > 0) {
+                                v_kurse_vsego.html($(data).find('h3.plain a').html());
+                                mark_readed(next_ids[0].onclick());
+                            } else {
+                                $(form).html(data);
+                            }
+                        });
                     }
+                    mark_readed(v_kurse[0].onclick());
                 });
                 v_kurse_vsego.insertAfter(v_kurse);
                 $('<span>, </span>').insertAfter(v_kurse);
