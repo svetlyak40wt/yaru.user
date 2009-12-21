@@ -6,11 +6,15 @@
 // @include        http://*.ya.ru/friends.xml*
 // ==/UserScript==
 //
-// Version: 0.1.2
+// Version: 0.1.3
 // Author: Alexander Artemenko svetlyak.40wt at gmail
 // Site: http://github.com/svetlyak40wt/yaru.user/
 //
 // ChangeLog
+//
+// 0.1.3
+//
+// * Добавлено разделение ссылок пробелом.
 //
 // 0.1.2
 //
@@ -49,7 +53,7 @@ function init_plugin() {
             widgets.each(function(i, form) {
                 log('procession form');
                 var v_kurse = $(form).find('a.update');
-                var v_kurse_vsego = $('<a href="" class="update">в курсе всего</a>');
+                var v_kurse_vsego = $('<a href="" class="update">&nbsp;в&nbsp;курсе&nbsp;всего</a>');
                 v_kurse_vsego.click(function(e) {
                     e.preventDefault();
                     var ajax_params = form.onclick();
